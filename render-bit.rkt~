@@ -1,0 +1,12 @@
+#lang slideshow
+
+(define (render-bit color)
+  (cond
+    [(= color 0) (rectangle 50 50)]
+    [(= color 1) (filled-rectangle 50 50)]
+    )
+  )
+
+
+(render-bit 1)
+(render-bit 0)

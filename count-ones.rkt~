@@ -1,0 +1,17 @@
+#lang slideshow
+
+
+(define (count-ones lst)
+  (define (helper lst current)
+    (cond
+      [(empty? lst) current]
+      [(= (first lst) 1) (helper (rest lst)
+                                 (+ current 1))]
+      [else (helper (rest lst)
+                    current)]
+      )
+    )
+  (helper lst 0)
+  )
+
+(count-ones '(1 0 0 1 1 1 0 1))
