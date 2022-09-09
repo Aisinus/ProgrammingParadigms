@@ -1,0 +1,110 @@
+#lang slideshow
+
+(define (binary-to-decimal lst)
+  (define (helper lst current)
+          (cond
+               [(empty? lst) current]
+               [(= (first lst) 1) (helper (rest lst)
+                                          (+ current (expt 2 (- (length lst) 1))))]
+               [else (helper (rest lst) current)]
+               )
+          )
+  (helper lst 0)
+)
+
+(binary-to-decimal '(1 0 1 1 0))
+
+
+(define (count-zeros lst)
+  (define(helper lst current)
+    (cond
+      [(empty? lst) (cond
+                      [(= current -1) 0]
+                      [else current]
+                      )]
+      [(= (first lst) 0) (cond
+                           [(= current -1) (helper (rest lst) current)]
+                           [else (helper (rest lst) (+ current 1))]
+                           )]
+      [(= (first lst) 1) (cond
+                           [(= current -1) (helper (rest lst) 0)]
+                           [else (helper (rest lst) current)]
+                           )]
+      )
+    )
+  (helper lst -1)
+  )
+
+(count-zeros '(0 0 0 1 0 1 1 0))
+
+
+(define (encode-with-lengths lst)
+  (define (remove-lead-zero lst is-zero)
+    (cond
+      [(= is-zero 1) (cond
+                          [(empty? lst) 0]
+                          [(= (first lst) 0) (remove-lead-zero (rest lst) 1)]
+                          [(= (first lst) 1) (remove-lead-zero lst 0)]
+                          )]
+      [(= is-zero 0) lst]
+      )
+    )
+
+  (define (number-count number lst current res-lst)
+    (cond
+      [(empty? lst)(append res-lst (list current) )]
+      [(= (first lst) number) (number-count number (rest lst) (+ current 1) res-lst)]
+      [(not (= (first lst) number))  (number-count (first lst) (rest lst) 1 (append res-lst (list current) )) ]
+      )
+    )
+
+  
+  (number-count 1 (remove-lead-zero lst 1) 0 (list))
+  )
+
+
+(encode-with-lengths '(0 0 0 1 1 0 1 1 1 0 0))
+
+
+(define (binary-odd? lst)
+  (cond
+    [(= (first (reverse lst)) 0) #f]
+    [(= (first (reverse lst)) 1) #t]
+    )
+  )
+
+(binary-odd? '(1 0 1 1 0))
+(binary-odd? '(1 0 1 1 1))
+
+(define (decrement lst)
+  (define (helper lst res-lst check)
+    (cond
+      [(empty? lst) (reverse res-lst)]
+      [(= check 1) (append (reverse lst) (reverse res-lst))]
+      [(and (= (first lst) 0) (= check 0) ) (helper (rest lst) (append res-lst (list 1)) 0 )]
+      [(and (= (first lst) 1) (= check 0) ) (helper (rest lst) (append res-lst (list 0)) 1 )]
+      )
+    )
+  
+  (define (remove-lead-zero lst is-zero)
+    (cond
+      [(= is-zero 1) (cond
+                          [(empty? lst) 0]
+                          [(= (first lst) 0) (remove-lead-zero (rest lst) 1)]
+                          [(= (first lst) 1) (remove-lead-zero lst 0)]
+                          )]
+      [(= is-zero 0) lst]
+      )
+    )
+  
+  
+  (cond
+    [(= (length lst) 1) (list 0)]
+    [else (remove-lead-zero (helper (reverse lst) (list) 0) 1)]
+    )
+  )
+
+(decrement '(1 0 1 1 0))
+(decrement '(1 0 0 0 0))
+(decrement '(0))
+
