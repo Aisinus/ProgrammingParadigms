@@ -26,4 +26,4 @@
 ; 3
 
 ; ## c
-; In this case, tail recursion will only worsen the speed of the function because it will take up extra memory to store the variable. 
+; In this case, tail recursion will help to avoid allocationg a new stack frame for a function because the calling function will simply return the value that it gets from the called function.
