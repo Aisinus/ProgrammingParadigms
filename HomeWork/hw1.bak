@@ -1,0 +1,133 @@
+#lang slideshow
+
+
+; My functions
+
+(define (operator? arg)
+    (cond
+      [(empty? arg) #f]
+      [else (ormap (lambda (x) (equal? arg x)) '(+ - * / ^ = < >))]
+      )
+  )
+
+(define (term_n expr n)
+  (define (get_term expr n k)
+    (cond
+      [(equal? n k) (first expr)]
+      [else (get_term (rest expr) n (+ 1 k))]
+      )
+    )
+  (cond
+    [(not (number? n)) (error "Expected a n summand from expression, but got" n)]
+    [(> 1 n) (error "Expected n>=1 summand from expression, but got" n)]
+    [(< (length expr) (+ n 1)) (error "Expected n < terms in expression but got" n)]
+    [else (get_term expr n 0)]
+    )
+  )
+
+(define (expression_type? expr type)
+  (define (helper expr isoperation ok)
+    (cond
+      [(empty? expr) ok]
+      [(and isoperation (operator? (first expr))) (helper (rest expr) #f #t)]
+      [(and (not isoperation) (or (variable? (first expr)) (number? (first expr)))) (helper (rest expr) #f #t)]
+      [(and (not isoperation) (pair? (first expr)) (> (length (first expr)) 2)) (helper (first expr) #t #f)]
+      [else #f]
+      )
+    )
+  (cond
+    [(symbol? expr) #f]
+    [(< (length expr) 3) #f]
+    [(equal? (first expr) type) (helper (rest expr) #f #f)]
+    [else #f]
+   )
+  )
+
+
+; Exercise 1.1
+
+(define (variable? expr)
+  (cond
+  [(not (symbol? expr)) #f]
+  [else (not (operator? expr))]
+    )
+  )
+
+
+(define (sum? expr)
+  (expression_type? expr `+)
+  )
+
+
+
+(define (summand-1 expr)
+  (cond
+    [(not (sum? expr)) (error "Expected a sum expression of the form `(+ <expr> <expr>), but got: " expr)]
+    [else (term_n expr 1)]
+   )
+  )
+
+(define (summand-2 expr)
+  (cond
+    [(not (sum? expr)) (error "Expected a sum expression of the form `(+ <expr> <expr>), but got: " expr)]
+    [else (term_n expr 2)]
+   )
+  )
+
+
+(define (product? expr)
+  (expression_type? expr `*)
+  )
+
+
+(define (multiplier-1 expr)
+  (cond
+    [(not (product? expr)) (error "Expected a product expression of the form `(* <expr> <expr>), but got: " expr)]
+    [else (term_n expr 1)]
+   )
+  )
+
+(define (multiplier-2 expr)
+  (cond
+    [(not (product? expr)) (error "Expected a product expression of the form `(* <expr> <expr>), but got: " expr)]
+    [else (term_n expr 2)]
+   )
+  )
+
+
+; Exercise 1.2
+
+(define (derivative exrp arg)
+  (define (helper expr arg)
+    (cond
+      [(list? expr)(cond
+                     [(sum? expr) (append (list) (map (lambda (x) (helper x arg)) expr) )]
+                     [(product? expr) (append (list `+) (map (lambda (x) (append (list `* (helper x arg)) (remw x (rest expr))) ) (rest expr)))]
+                     [else (error "Invalid input of expression: " expr)]
+                     )]
+      [(variable? expr) (cond
+                          [(equal? expr arg) `1]
+                          [else `0]
+                          )]
+      [(number? expr) `0]
+      [else expr ]
+      )
+    ) 
+  (cond
+    [(operator? arg) (error "Expected a symbol, but got:" arg)]
+    [else (helper exrp arg)]
+    )
+  )
+
+(derivative `(+ 1 x x y (+ 1 x)) `x)
+(derivative `(* x 1) `x)
+(derivative '(* (+ x y) (+ x (+ x x))) 'x)
+(derivative '(+ 1 x y (* + y z)) 'x)
+
+; Exercise 1.3
+
+(define (simplify expr)
+  (cond
+    [(sum? expr) ()]
+    )
+  )
